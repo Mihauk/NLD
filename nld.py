@@ -53,7 +53,7 @@ def realisation(ic):
     for i in range(t):
         x.update(n,np.random.randint(3))
         rho_ft[:,i+1] = copy.deepcopy(x.ft)
-    return rho_ft[13,:]
+    return rho_ft[q,:]
 
 
 
@@ -64,7 +64,8 @@ t = 300
 A = 0.1
 samples =100000
 freq = 2*np.pi*np.fft.fftfreq(l)
-Q = freq[13]
+q = 30
+Q = freq[q]
 ini_conf = A*np.cos(Q*np.arange(l))+0.5
 #ini_conf = (0.02*np.cos(freq[20]*np.arange(l)) + 0.02*np.cos(freq[40]*np.arange(l)))+0.6
 

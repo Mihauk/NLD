@@ -82,5 +82,5 @@ ini_conf = A*np.cos(freq[Q]*np.arange(l))+0.5 # The initial density configration
 d_ft =  np.asarray ( Parallel ( n_jobs = n_jobs ) ( delayed (realisation)  ( ini_conf )  for j in  range ( samples ) ) )
 
 
-with h5py.File("../data/hts_0.5_A.1_t300_k13_L300_rhoQ.hdf5", "w") as f:
+with h5py.File("./hts_0.5_A.1_t300_k13_L300_rhoQ.hdf5", "w") as f:
     dset = f.create_dataset("init", data=d_ft )

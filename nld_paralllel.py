@@ -4,7 +4,7 @@ import numpy as np
 import copy
 from joblib import Parallel , delayed
 #from numba import njit, prange
-#iimport h5py
+import h5py
 
 
 # Creating a class that stores the configration of the system and had a method to update it
@@ -63,7 +63,7 @@ def realisation(ic):
     for i in range(t):
         x.update(n,np.random.randint(3))
         rho_ft[:,i+1] = copy.deepcopy(x.ft)
-    return rho_ft[freq[Q],:]
+    return rho_ft[q,:]
 
 
 
@@ -73,8 +73,9 @@ l = 3*n # total number of sites
 t = 300 # final time
 A = 0.1 # Amplitude of Disturbances
 samples =2 #total number of samples
-freq = 2*np.pi*np.fft.fftfreq(l) 
-Q = 30 # The frequency of the initial disturbance
+freq = 2*np.pi*np.fft.fftfreq(l)
+q = 30
+Q = freq[q] # The frequency of the initial disturbance
 ini_conf = A*np.cos(freq[Q]*np.arange(l))+0.5 # The initial density configration
 #ini_conf = (0.02*np.cos(freq[20]*np.arange(l)) + 0.02*np.cos(freq[40]*np.arange(l)))+0.6
 

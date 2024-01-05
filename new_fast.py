@@ -59,7 +59,7 @@ Q = freq[q]
 rho_in = n0 + A*np.cos(Q*np.arange(l))
 
 s = time.time()
-d_ft =  np.asarray ( Parallel ( n_jobs = n_jobs ) ( delayed (realisation) (t,l,ic = rho_in) for j in  range ( samples )  ) )
+d_ft =  np.mean(np.asarray ( Parallel ( n_jobs = n_jobs ) ( delayed (realisation) (t,l,ic = rho_in) for j in  range ( samples )  ) ), axis=0 )
 e = time.time()
 
 print ((e-s)/(t*l*samples))

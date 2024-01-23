@@ -15,17 +15,6 @@ function trimer_updates(trip)
     return convert(Vector{Bool},trip)
 end
 
-function trimer_updates(trip)
-    if trip == [0, 1, 0]
-        return convert(Vector{Bool}, rand([[1, 0, 0], [0, 0, 1]]))
-    elseif trip == [0, 0, 1]
-        return convert(Vector{Bool}, rand([[1, 0, 0], [0, 1, 0]]))
-    elseif trip == [1, 0, 0]
-        return convert(Vector{Bool}, rand([[0, 0, 1], [0, 1, 0]]))
-    end
-    return convert(Vector{Bool},trip)
-end
-
 function update!(state, off)
     state = circshift(collect(Iterators.flatten(map(trimer_updates, Iterators.partition(circshift(state, -off), 3)))), off)
 end

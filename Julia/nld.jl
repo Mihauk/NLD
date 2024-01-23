@@ -35,7 +35,7 @@ state = rand(Float64, l) .<= rho_in
 a = zeros(Bool, samples, l, tmax+1)
 
 @time begin
-    for i in collect(1:samples)
+    for i in 1:samples
         off = rand(0:2)
         a[i,:,1] = rand(Float64, l) .<= rho_in
         for t in collect(1:tmax)

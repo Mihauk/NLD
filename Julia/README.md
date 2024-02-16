@@ -1,4 +1,4 @@
-# Julia code using CUDA GPU's to time evolve a lattice gas diffusion model(with non-linearity).
+# Julia code to time evolve a lattice gas diffusion model(with non-linearity).
 
 - The code takes in command line arguments l,tmax,samples and total_samples. And saves the output in two different files as avereage over all the samples the density configration and the current configration.
 

@@ -5,11 +5,6 @@ using HDF5
 using Random
 using Statistics
 
-samples = 1000
-total_samples = 10000
-tmax = 625
-l = 99999
-
 mutable struct data
     t_st::Matrix{Float64}
     t_curr::Matrix{Float64}
@@ -99,6 +94,11 @@ function sum_multi_thread(samples, tmax, l)
     chunk_sums = fetch.(tasks)
     return [mean(map(p->p.t_st, chunk_sums), dims = 1)[1], mean(map(p->p.t_curr, chunk_sums), dims = 1)[1]]
 end
+
+l = parse(Int,ARGS[1])
+tmax = parse(Int,ARGS[2])
+samples = parse(Int,ARGS[3])
+total_samples = parse(Int,ARGS[4])
 
 for j in 1:total_samples
     k = j>=2 ? 2 : 1

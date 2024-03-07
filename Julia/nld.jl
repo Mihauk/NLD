@@ -78,15 +78,6 @@ function sum_multi_thread(samples, tmax, l)
     return [mean(map(p->p.t_st, chunk_sums), dims = 1)[1], mean(map(p->p.t_curr, chunk_sums), dims = 1)[1]]
 end
 
-function sum_multi_thread(samples, tmax, l)
-    chunks = Iterators.partition(1:samples, samples ÷ Threads.nthreads())
-    tasks = map(chunks) do chunk
-        Threads.@spawn with_threads(chunk,tmax,l)
-    end
-    chunk_sums = fetch.(tasks)
-    return [mean(map(p->p.t_st, chunk_sums), dims = 1)[1], mean(map(p->p.t_curr, chunk_sums), dims = 1)[1]]
-end
-
 l = parse(Int,ARGS[1])
 tmax = parse(Int,ARGS[2])
 samples = parse(Int,ARGS[3])

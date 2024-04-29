@@ -41,7 +41,7 @@ end
 function single_upd!(conf)
     l = length(conf.st)
     off = rand(0:2)
-    roll_conf = Conf(circshift(conf.st, -off), circshift(conf.curr, -off))
+    roll_conf = Conf(circshift(conf.st, -off), zeros(Int, l))
     p = rand(Bool,convert(Int,l/3)) 
     update!(roll_conf, p)
     conf.st = circshift(roll_conf.st, off)

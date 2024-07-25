@@ -146,7 +146,7 @@ samples = parsed_args["samples"]
 tmax = parsed_args["t_max"]
 t_samples = parsed_args["t_samples"]
 
-filename = "./rho_dotp-n_$n0-A_$A-q_$q-samples_$samples-tmax_$tmax-l-$l.h5"
+filename = "./rho_dotp-n_$n0-A_$A-q_$q-t_samples_$t_samples-samples_each_run_$samples-tmax_$tmax-l-$l.h5"
 dataset_names = ["m_rho", "v_rho", "s_rho", "k_rho"]
 
 println("Start!")

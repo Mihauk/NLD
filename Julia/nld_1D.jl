@@ -165,7 +165,7 @@ for outer in 1:t_samples
     # Save the data at the end of the inner loop
     h5open(filename, "w") do file
         for i in 1:4
-            write(file, dataset_names[i], previous_data[i] + data[i])
+            write(file, dataset_names[i], mean(previous_data[i] + data[i]))
         end
     end
 end

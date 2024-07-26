@@ -66,7 +66,7 @@ function with_threads(samples, tmax, l, A, q, n0, buf)
         Ax = @alloc(Float64, l)
         rho_in = @alloc(Float64, l)
         freq = 2π * rfftfreq(l)
-        Q = freq[q]
+        Q = freq[q+1]
         Ax = cos.(Q * (1:l))
         rho_in = n0 .+ A * Ax
         for _ in samples

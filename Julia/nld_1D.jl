@@ -42,7 +42,7 @@ function parse_commandline()
             help = "wave number mode of initial perturbation. It is constrained to be 0<q<l/2"
             arg_type = Int
             default = 10
-        "--t_samples", "-T"
+        "--t_samples", "-S"
             help = "Total number of samples for the entire run"
             arg_type = Int
             default = 10
@@ -106,6 +106,7 @@ function with_threads(samples, tmax, l, A, q, n0, buf)
                         circshift!(conf, off)
                         nothing
                     end
+                    rho_t = @alloc(Float64, 1)
                     rho_t = sum(conf .* Ax)/l
                     @inbounds my_data.m_rho[t+1] += rho_t
                     @inbounds my_data.v_rho[t+1] += rho_t^2
@@ -145,10 +146,9 @@ tmax = parsed_args["t_max"]
 t_samples = parsed_args["t_samples"]
 
 filename = "./data/rho_dotp-n_$n0-A_$A-q_$q-t_samples_$t_samples-samples_each_run_$samples-tmax_$tmax-l-$l.h5"
-dataset_names = ["m_rho", "v_rho", "s_rho", "k_rho"]
+dataset_names = ["m1", "m2", "m3", "m4"]
 
 println("Start!")
-
 for outer in 1:t_samples
     # Initialize or read previous data
     if outer == 1
@@ -167,5 +167,4 @@ for outer in 1:t_samples
         end
     end
 end
-
 println("Done!")

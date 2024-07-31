@@ -1,0 +1,17 @@
+[package]
+name = "nld"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+rand = "0.8.3"
+rustfft = "6.2.0"
+ndarray = "0.15.6"
+clap = { version = "4.5.11", features = ["derive"] }
+
+[dev-dependencies]
+criterion = "0.5"
+
+[[bench]]
+name = "with_threads"
+harness = false

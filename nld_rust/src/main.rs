@@ -52,7 +52,7 @@ fn main() {
     let samples = args.samples;
     let t_samples = args.outer_samples;
 
-    let filename = format!("./target/data/rho_dotp-n_{}-A_{}-q_{}-t_samples_{}-samples_each_run_{}-tmax_{}-l-{}.h5",
+    let filename = format!("./target/debug/data/rho_dotp-n_{}-A_{}-q_{}-t_samples_{}-samples_each_run_{}-tmax_{}-l-{}.h5",
                            n0, a, q, t_samples, samples, tmax, l);
     let dataset_names = ["m1", "m2", "m3", "m4"];
 

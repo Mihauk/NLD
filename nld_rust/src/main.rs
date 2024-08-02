@@ -1,6 +1,10 @@
 use nld::with_threads;
 use clap::Parser;
 use hdf5::File;
+use std::thread;
+use std::time::Instant;
+//use threadpool::ThreadPool;
+//use std::sync::mpsc::channel;
 //use ndarray::Array1;
 
 #[derive(Parser, Debug)]
@@ -38,80 +42,110 @@ struct Args {
 
 fn main() {
 
-    let args = Args::parse();
+    let args: Args = Args::parse();
 
     println!("Start!");
     println!("Running 1D non-linear simulation with the following parameters:");
     println!("{:?}", args);
 
-    let n0 = args.eq_den;
-    let a = args.amplitude;
-    let l = args.chain_length;
-    let q = args.wave_number;
-    let tmax = args.t_max;
-    let samples = args.samples;
-    let t_samples = args.outer_samples;
+    let n0: f64 = args.eq_den;
+    let a: f64 = args.amplitude;
+    let l: usize = args.chain_length;
+    let q: usize = args.wave_number;
+    let tmax: usize = args.t_max;
+    let samples: usize = args.samples;
+    let t_samples: usize = args.outer_samples;
 
-    let filename = format!("./target/debug/data/rho_dotp-n_{}-A_{}-q_{}-t_samples_{}-samples_each_run_{}-tmax_{}-l-{}.h5",
+    let filename: String = format!("./target/debug/data/rho_dotp-n_{}-A_{}-q_{}-t_samples_{}-samples_each_run_{}-tmax_{}-l-{}.h5",
                            n0, a, q, t_samples, samples, tmax, l);
-    let dataset_names = ["m1", "m2", "m3", "m4"];
+    let dataset_names: [&str; 4] = ["m1", "m2", "m3", "m4"];
 
-    let data = with_threads(samples, tmax, l, q, a, n0);
+    let now: Instant = Instant::now();
 
+    let mut data: [Vec<f64>; 4] = [Vec::new(), Vec::new(), Vec::new(), Vec::new()];
+
+
+//############################################################################################################################################################
+
+    // Concurrency using ThreadPool
+
+    /*
+    let n_workers: usize = 4;
+    //let n_jobs: i32 = 8;
+    let pool: ThreadPool = ThreadPool::new(n_workers);
+
+    let (tx, rx) = channel();
+
+    for _ in 0..t_samples {
+        let tx = tx.clone();
+        pool.execute(move|| {
+            tx.send(with_threads(samples, tmax, l, q, a, n0)).expect("channel will be there waiting for the pool");
+        });
+    }
+
+    for received_data in rx.iter().take(t_samples) {
+        for j in 0..received_data.len() {
+            if data[j].is_empty() {
+                data[j].clone_from(&received_data[j])
+            } else {
+                data[j] = data[j].iter()
+                    .zip(received_data[j].iter())
+                    .map(|(&x, &y)| x + y)
+                    .collect();
+            }
+        }
+    }
+
+    */
+
+//############################################################################################################################################################
+    
+    // Concurrency using Std::Threads
+
+    
+    // here t_samples is the number of threads
+
+    let handles: Vec<_> = (0..t_samples).map(|_| {
+        thread::spawn(move || {
+            with_threads(samples, tmax, l, q, a, n0)
+        })
+    }).collect();
+        
+    for handle in handles {
+        let thread_data:[Vec<f64>; 4] = handle.join().unwrap();
+        for j in 0..thread_data.len() {
+            if data[j].is_empty() {
+                data[j].clone_from(&thread_data[j])
+            } else {
+                data[j] = data[j].iter()
+                    .zip(thread_data[j].iter())
+                    .map(|(&x, &y)| x + y)
+                    .collect();
+            }
+        }
+    }
+    
+
+
+    //############################################################################################################################################################
+
+
+
+    let elapsed_time: std::time::Duration = now.elapsed();
+
+    println!("Running time: {} seconds.", elapsed_time.as_secs());
+
+    // Write the data to a hdf5 file
+    println!("Writing data to file: {}", filename);
 
     let file = File::create(filename).unwrap();
 
     for (i, &name) in dataset_names.iter().enumerate() {
         // Create a new dataset
-        let dataset = file.new_dataset::<f64>().shape(data[i].len()).create(name).unwrap();
+        let dataset: hdf5::Dataset = file.new_dataset::<f64>().shape(data[i].len()).create(name).unwrap();
         // Write the combined data to the dataset
         dataset.write(&data[i]).unwrap();
     }
-
-
- /*   
-    for outer in 0..=t_samples {
-        let data= with_threads(samples, tmax, l, q, a, n0);
-
-        let file = File::open_rw(&filename).unwrap_or_else(|_| File::create(&filename).unwrap());
-
-        for (i, &dataset_name) in dataset_names.iter().enumerate() {
-            let dataset = file.new_dataset::<f64>().shape(data[i].len()).create(dataset_name).unwrap();
-            if outer == 0 {
-                dataset.write(&data[i]).unwrap();
-            } else {
-                let mut previous_data = dataset.read().unwrap();
-                for (j, &value) in data[i].iter().enumerate() {
-                    previous_data[j] += value;
-                }
-                dataset.write(&previous_data).unwrap();
-            }
-        }
-    }
-
-    for outer in 0..=t_samples {
-        // Initialize or read previous data
-        let previous_data: [Vec<f64>] = if outer == 0 {
-            vec![Vec<f64>::zeros(tmax); 4]
-        } else {
-            let file = File::open(filename).unwrap();
-            dataset_names.iter().map(|&name| {
-                let dataset = file.dataset(name).unwrap();
-                dataset.read_1d::<f64>().unwrap()
-            }).collect()
-        };
-
-        let data: [Vec<f64>; 4] = with_threads(samples, tmax, l, q, a, n0); // your computations here
-
-        // Save the data at the end of the inner loop
-        let file = File::create(filename).unwrap();
-        for (i, &name) in dataset_names.iter().enumerate() {
-            let dataset = file.new_dataset::<f64>().create(name).unwrap();
-            let combined_data = &previous_data[i] + &data[i];
-            dataset.write(&combined_data).unwrap();
-        }
-    }
- */
 
     println!("Done!");
 }

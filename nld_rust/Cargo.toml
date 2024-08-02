@@ -8,6 +8,10 @@ rand = "0.8.3"
 rustfft = "6.2.0"
 ndarray = "0.15.6"
 hdf5 = "0.8.1"
+crossbeam = "0.8.4"
+num_cpus = "1.16.0"
+rayon = "1.10.0"
+threadpool = "1.8.1"
 clap = { version = "4.5.11", features = ["derive"] }
 
 [dev-dependencies]

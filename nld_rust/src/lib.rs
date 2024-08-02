@@ -18,12 +18,12 @@ struct TotalData {
 }
 
 fn rfftfreq(n: usize) -> Vec<f64> {
-    (0..n / 2 + 1).map(|i| i as f64 / n as f64).collect()
-}
+    (0..n / 2 + 1).map(|i: usize| i as f64 / n as f64).collect()
+    }
 
 fn update(config: &mut Conf, p: &[bool]) {
     for (j, &pj) in p.iter().enumerate() {
-        let idx = 3 * j;
+        let idx: usize = 3 * j;
         if config.st[idx] && !config.st[idx + 1] && !config.st[idx + 2] {
             config.st[idx] = false;
             config.st[idx + 1] = pj;
@@ -40,13 +40,13 @@ fn update(config: &mut Conf, p: &[bool]) {
     }
 }
 
-pub fn with_threads(samples: usize, tmax: usize, l: usize, q: usize, a: f64, n0: f64) ->  [Vec<f64>; 4] {
-    let freq = rfftfreq(l);
-    let q_freq = freq[q+1];
-    let ax: Vec<f64> = (0..l).map(|i| (q_freq * i as f64 * 2.0 * PI).cos()).collect();
+pub fn with_threads(samples: usize, tmax: usize, l: usize, q: usize, a: f64, n0: f64) -> [Vec<f64>; 4] {
+    let freq: Vec<f64> = rfftfreq(l);
+    let q_freq: f64 = freq[q+1];
+    let ax: Vec<f64> = (0..l).map(|i: usize| (q_freq * i as f64 * 2.0 * PI).cos()).collect();
     let rho_in: Vec<f64> = ax.iter().map(|&x| n0 + a * x).collect();
 
-    let mut my_data = TotalData {
+    let mut my_data: TotalData = TotalData {
         m1: vec![0.0; tmax],
         m2: vec![0.0; tmax],
         m3: vec![0.0; tmax],
@@ -54,9 +54,9 @@ pub fn with_threads(samples: usize, tmax: usize, l: usize, q: usize, a: f64, n0:
     };
 
     for _ in 0..samples {
-        let mut rng = rand::thread_rng();
-        let mut config = Conf {
-            st: (0..l).map(|k| rng.gen::<f64>() <= rho_in[k]).collect(),
+        let mut rng: rand::prelude::ThreadRng = rand::thread_rng();
+        let mut config: Conf = Conf {
+            st: (0..l).map(|k: usize| rng.gen::<f64>() <= rho_in[k]).collect(),
         };
 
         //let rho_0: f64 = config.st.iter().zip(&ax.iter()).map(|(&s, &ax)| if s { a } else { 0.0 }).sum::<f64>() / l as f64;
@@ -65,7 +65,7 @@ pub fn with_threads(samples: usize, tmax: usize, l: usize, q: usize, a: f64, n0:
             .map(|(&st, &ax)| if st { ax } else { 0.0 })
             .sum();
 
-        let rho_0 = dot_p / l as f64;
+        let rho_0: f64 = dot_p / l as f64;
 
         my_data.m1[0] += rho_0;
         my_data.m2[0] += rho_0.powi(2);
@@ -73,7 +73,7 @@ pub fn with_threads(samples: usize, tmax: usize, l: usize, q: usize, a: f64, n0:
         my_data.m4[0] += rho_0.powi(4);
 
         for t in 1..tmax {
-            let off = rand::thread_rng().gen_range(0..3);
+            let off: usize = rand::thread_rng().gen_range(0..3);
             config.st.rotate_right(off);
             let p: Vec<bool> = (0..(l / 3)).map(|_| rand::random()).collect();
             //println!("{:?}", p);
@@ -84,7 +84,7 @@ pub fn with_threads(samples: usize, tmax: usize, l: usize, q: usize, a: f64, n0:
                 .zip(ax.iter())
                 .map(|(&st, &ax)| if st { ax } else { 0.0 })
                 .sum();
-            let rho_t = dot_p_t / l as f64;
+            let rho_t: f64 = dot_p_t / l as f64;
             my_data.m1[t] += rho_t;
             my_data.m2[t] += rho_t.powi(2);
             my_data.m3[t] += rho_t.powi(3);

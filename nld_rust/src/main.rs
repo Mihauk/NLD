@@ -70,7 +70,7 @@ fn main() {
     // Concurrency using ThreadPool
 
     /*
-    let n_workers: usize = 56;
+    let n_workers: usize = 100;
     //let n_jobs: i32 = 8;
     let pool: ThreadPool = ThreadPool::new(n_workers);
 
@@ -90,13 +90,14 @@ fn main() {
             } else {
                 data[j] = data[j].iter()
                     .zip(received_data[j].iter())
-                    .map(|(&x, &y)| x + y)
+                    .map(|(&x, &y)| (x + y) / 2.0)
                     .collect();
             }
         }
     }
-
     */
+
+    
 
 //############################################################################################################################################################
     
@@ -119,13 +120,13 @@ fn main() {
             } else {
                 data[j] = data[j].iter()
                     .zip(thread_data[j].iter())
-                    .map(|(&x, &y)| x + y)
+                    .map(|(&x, &y)| (x + y) / 2.0)
                     .collect();
             }
         }
     }
     
-
+    
 
     //############################################################################################################################################################
 

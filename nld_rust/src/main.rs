@@ -70,7 +70,7 @@ fn main() {
     // Concurrency using ThreadPool
 
     /*
-    let n_workers: usize = 4;
+    let n_workers: usize = 56;
     //let n_jobs: i32 = 8;
     let pool: ThreadPool = ThreadPool::new(n_workers);
 

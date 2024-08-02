@@ -14,10 +14,11 @@ struct Args {
     #[arg(short='n', long="eq_den", default_value_t = 0.5)]
     eq_den: f64,
 
-    /// Total number of samples
+    /// Number of samples for each thread
     #[arg(short='s', long="samples", default_value_t = 100)]
     samples: usize,
 
+    /// Total number of samples
     #[arg(short='S', long="outer_samples", default_value_t = 100)]
     outer_samples: usize,
 

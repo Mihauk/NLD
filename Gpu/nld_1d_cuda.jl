@@ -148,6 +148,8 @@ filename = "./data/rho_dotp-n_$n0-A_$A-q_$q-t_samples_$t_samples-samples_each_ru
 dataset_names = ["m1", "m2", "m3", "m4"]
 
 for outer in 1:t_samples
+
+    CUDA.device!(rand(0:1))
     # Initialize or read previous data
     if outer == 1
         previous_data = [zeros(Float64, tmax+1), zeros(Float64, tmax+1), zeros(Float64, tmax+1), zeros(Float64, tmax+1)] # or some initial values

@@ -2,7 +2,7 @@ use rand::Rng;
 //use rustfft::num_complex::Complex;
 //use rustfft::FftPlanner;
 use std::f64::consts::PI;
-use rayon::prelude::*;
+//use rayon::prelude::*;
 //use ndarray::arr2;
 
 #[derive(Debug)]
@@ -26,7 +26,7 @@ fn rfftfreq(n: usize) -> Vec<f64> {
     
 /// Update the configuration of the system sequentially
 /* 
-fn update(config: &mut Conf, p: &[bool]) {
+fn update(config: &mut Conf, p: &[bool]) { // old version
     for (j, &pj) in p.iter().enumerate() {
         let idx: usize = 3 * j;
         if config.st[idx] && !config.st[idx + 1] && !config.st[idx + 2] {
@@ -45,10 +45,34 @@ fn update(config: &mut Conf, p: &[bool]) {
     }
 }
 */
+fn update(config: &mut Conf, p: &[bool]) {  // new version
+    config.st.chunks_mut(3).zip(p.iter()).for_each(|(chunk, &pj)| {
+        match chunk {
+            [true, false, false] => {
+                chunk[0] = false;
+                chunk[1] = pj;
+                chunk[2] = !pj;
+            }
+            [false, true, false] => {
+                chunk[0] = pj;
+                chunk[1] = false;
+                chunk[2] = !pj;
+            }
+            [false, false, true] => {
+                chunk[0] = pj;
+                chunk[1] = !pj;
+                chunk[2] = false;
+            }
+            _ => {}
+        }
+    });
+}
+
 
 //##################################################################################################################################################
 
 /// Update the configuration of the system in parallel
+/*
 fn update(config: &mut Conf, p: &[bool]) {
     config.st.par_chunks_mut(3).zip(p.par_iter()).for_each(|(chunk, &pj)| {
         match chunk {
@@ -71,15 +95,23 @@ fn update(config: &mut Conf, p: &[bool]) {
         }
     });
 }
-
+*/
 //##################################################################################################################################################
 
-
+/// Update the configuration of the system for a given 
+/// Chain Length (l),
+/// number of samples (samples), 
+/// time of evolution (tmax),
+/// q (wave_number),
+/// a(amplitude of initial perturbation) and
+/// n0 (equilibrium density),
 pub fn with_threads(samples: usize, tmax: usize, l: usize, q: usize, a: f64, n0: f64) -> [Vec<f64>; 4] {
     let freq: Vec<f64> = rfftfreq(l);
     let q_freq: f64 = freq[q+1];
-    let ax: Vec<f64> = (0..l).into_par_iter().map(|i: usize| (q_freq * i as f64 * 2.0 * PI).cos()).collect();
-    let rho_in: Vec<f64> = ax.par_iter().map(|&x| n0 + a * x).collect();
+    //let ax: Vec<f64> = (0..l).into_par_iter().map(|i: usize| (q_freq * i as f64 * 2.0 * PI).cos()).collect(); // parallel version
+    let ax: Vec<f64> = (0..l).map(|i: usize| (q_freq * i as f64 * 2.0 * PI).cos()).collect();
+    //let rho_in: Vec<f64> = ax.par_iter().map(|&x| n0 + a * x).collect(); // parallel version
+    let rho_in: Vec<f64> = ax.iter().map(|&x| n0 + a * x).collect();
 
     let mut my_data: TotalData = TotalData {
         m1: vec![0.0; tmax],
@@ -93,10 +125,15 @@ pub fn with_threads(samples: usize, tmax: usize, l: usize, q: usize, a: f64, n0:
         let mut config: Conf = Conf {
             st: (0..l).map(|k: usize| rng.gen::<f64>() <= rho_in[k]).collect(),
         };
-
-        //let rho_0: f64 = config.st.iter().zip(&ax.iter()).map(|(&s, &ax)| if s { a } else { 0.0 }).sum::<f64>() / l as f64;
+        // parallel version
+        /*
         let dot_p: f64 = config.st.par_iter()
             .zip(ax.par_iter())
+            .map(|(&st, &ax)| if st { ax } else { 0.0 })
+            .sum();
+         */
+        let dot_p: f64 = config.st.iter()
+            .zip(ax.iter())
             .map(|(&st, &ax)| if st { ax } else { 0.0 })
             .sum();
 
@@ -111,12 +148,17 @@ pub fn with_threads(samples: usize, tmax: usize, l: usize, q: usize, a: f64, n0:
             let off: usize = rand::thread_rng().gen_range(0..3);
             config.st.rotate_right(off);
             let p: Vec<bool> = (0..(l / 3)).map(|_| rand::random()).collect();
-            //println!("{:?}", p);
             update(&mut config, &p);
             config.st.rotate_left(off);
-            //let rho_t: f64 = config.st.iter().zip(&ax.iter()).map(|(&s, &ax)| if s { a } else { 0.0 }).sum::<f64>() / l as f64;
+            // parallel version
+            /*
             let dot_p_t: f64 = config.st.par_iter()
                 .zip(ax.par_iter())
+                .map(|(&st, &ax)| if st { ax } else { 0.0 })
+                .sum();
+            */
+            let dot_p_t: f64 = config.st.iter()
+                .zip(ax.iter())
                 .map(|(&st, &ax)| if st { ax } else { 0.0 })
                 .sum();
             let rho_t: f64 = dot_p_t / l as f64;

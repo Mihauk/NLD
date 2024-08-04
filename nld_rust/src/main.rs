@@ -14,12 +14,12 @@ struct Args {
     #[arg(short='n', long="eq_den", default_value_t = 0.5)]
     eq_den: f64,
 
-    /// Number of samples for each thread
+    /// Number of samples for each run
     #[arg(short='s', long="samples", default_value_t = 100)]
     samples: usize,
 
-    /// Total number of samples
-    #[arg(short='S', long="outer_samples", default_value_t = 100)]
+    /// Total number of samples 
+    #[arg(short='S', long="outer_samples", default_value_t = 10)]
     outer_samples: usize,
 
     /// Total number of time steps
@@ -71,7 +71,7 @@ fn main() {
     // Concurrency using ThreadPool
 
     /*
-    let n_workers: usize = 100;
+    let n_workers: usize = 4;
     //let n_jobs: i32 = 8;
     let pool: ThreadPool = ThreadPool::new(n_workers);
 
@@ -96,7 +96,8 @@ fn main() {
             }
         }
     }
-    */
+     */
+    
 
     
 
@@ -106,7 +107,7 @@ fn main() {
 
     
     // here t_samples is the number of threads
-
+    
     let handles: Vec<_> = (0..t_samples).map(|_| {
         thread::spawn(move || {
             with_threads(samples, tmax, l, q, a, n0)
@@ -126,12 +127,10 @@ fn main() {
             }
         }
     }
-    
-    
 
-    //############################################################################################################################################################
+//############################################################################################################################################################
 
-
+    // write the data to a hdf5 file
 
     let elapsed_time: std::time::Duration = now.elapsed();
 

@@ -166,5 +166,6 @@ for outer in 1:t_samples
             write(file, dataset_names[i], previous_data[i] .+ data[i])
         end
     end
+    GC.gc()
 end
 println("Done!")

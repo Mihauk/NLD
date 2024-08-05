@@ -15,6 +15,8 @@ And saves the output as .h5 file with the first four Cumulants stored with datas
 
 ```diff
 nohup julia nld_1d_cuda.jl -l 99999 -t 625 -s 100000 -a 0.1 -q 9999 &
+```
+```diff
 setsid julia nld_1d_cuda.jl -l 99999 -t 625 -s 100000 -a 0.1 -q 9999 &
 ```
 

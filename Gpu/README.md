@@ -21,6 +21,6 @@ rgb(9, 105, 218)
 
 ## Threading
 - set the number of CPU threads
-`nohup julia nld_1d_cuda.jl --threads 32 -l 99999 -t 625 -s 100000 -a 0.1 -q 9999 &`
-`setsid julia nld_1d_cuda.jl --threads 32 -l 99999 -t 625 -s 100000 -a 0.1 -q 9999 -n 0.5 &`
+- `nohup julia nld_1d_cuda.jl --threads 32 -l 99999 -t 625 -s 100000 -a 0.1 -q 9999 &`
+- `setsid julia nld_1d_cuda.jl --threads 32 -l 99999 -t 625 -s 100000 -a 0.1 -q 9999 -n 0.5 &`
 - here note that the samples > number of threads.

@@ -14,14 +14,6 @@ mutable struct Total_data
     m4::Vector{Float64}
 end
 
-function moment_cumulant(data)
-    μ = (data[1])
-    σ = sqrt.((data[2]) .- (μ.^2))
-    γ = (data[3] .- 3*(μ.*(σ.^2)) .- μ.^3)./(σ.^3)
-    κ = (data[4] .- 4*(μ.*(data[3])) .+ 6*(μ.*σ).^2 .+ 3*μ.^4)./(σ.^4)
-    return [μ, σ, γ, κ]
-end
-
 function parse_commandline()
     s = ArgParseSettings()
 
@@ -35,7 +27,7 @@ function parse_commandline()
             arg_type = Int
             default = 100
         "--samples", "-s"
-            help = "Number of samples for each saved file"
+            help = "Total number of samples"
             arg_type = Int
             default = 1000
         "--amplitude", "-a"
@@ -50,10 +42,6 @@ function parse_commandline()
             help = "wave number mode of initial perturbation. It is constrained to be 0<q<l/2"
             arg_type = Int
             default = 10
-        "--t_samples", "-S"
-            help = "Total number of samples for the entire run"
-            arg_type = Int
-            default = 10
         #"--flag1"
         #    help = "an option without argument, i.e. a flag"
         #    action = :store_true
@@ -63,6 +51,14 @@ function parse_commandline()
     end
 
     return parse_args(s)
+end
+
+function moment_cumulant(data)
+    μ = (data[1])
+    σ = sqrt.((data[2]) .- (μ.^2))
+    γ = (data[3] .- 3*(μ.*(σ.^2)) .- μ.^3)./(σ.^3)
+    κ = (data[4] .- 4*(μ.*(data[3])) .+ 6*(μ.*σ).^2 .+ 3*μ.^4)./(σ.^4)
+    return [μ, σ, γ, κ]
 end
 
 function update_d!(state,p)
@@ -152,9 +148,8 @@ q = parsed_args["wave_number"]
 l = parsed_args["chain_length"]
 samples = parsed_args["samples"]
 tmax = parsed_args["t_max"]
-t_samples = parsed_args["t_samples"]
 
-filename = "./data/rho_dotp-n_$n0-A_$A-q_$q-t_samples_$t_samples-samples_each_run_$samples-tmax_$tmax-l-$l.h5"
+filename = "./data/rho_dotp-n_$n0-A_$A-q_$q-samples_$samples-tmax_$tmax-l-$l.h5"
 dataset_names = ["m1", "m2", "m3", "m4"]
 
 data = moment_cumulant(sum_multi_thread(samples, tmax, l, A, q, n0))

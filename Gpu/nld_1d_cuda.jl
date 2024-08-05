@@ -90,6 +90,7 @@ function with_threads(samples, tmax, l, A, q, n0)
     rho_in = n0 .+ A * Ax
     
     for _ in samples
+        CUDA.device!(rand(0:1))
         conf = rand(Float64, l) .<= rho_in
         rho_0 = sum(conf .* Ax)/l
         @inbounds my_data.m1[1] += rho_0
@@ -115,6 +116,7 @@ function with_threads(samples, tmax, l, A, q, n0)
             @inbounds my_data.m3[t+1] += rho_t^3
             @inbounds my_data.m4[t+1] += rho_t^4
         end
+        CUDA.reclaim()
     end
     return my_data
 end
@@ -147,25 +149,9 @@ t_samples = parsed_args["t_samples"]
 filename = "./data/rho_dotp-n_$n0-A_$A-q_$q-t_samples_$t_samples-samples_each_run_$samples-tmax_$tmax-l-$l.h5"
 dataset_names = ["m1", "m2", "m3", "m4"]
 
-for outer in 1:t_samples
-
-    CUDA.device!(rand(0:1))
-    # Initialize or read previous data
-    if outer == 1
-        previous_data = [zeros(Float64, tmax+1), zeros(Float64, tmax+1), zeros(Float64, tmax+1), zeros(Float64, tmax+1)] # or some initial values
-    else
-        h5open(filename, "r") do file
-            previous_data = [read(file[dataset_names[i]]) for i in 1:4]
-        end
-    end
-
-    data = sum_multi_thread(samples, tmax, l, A, q, n0) # your computations here   
-    # Save the data at the end of the inner loop
-    h5open(filename, "w") do file
+h5open(filename, "w") do file
         for i in 1:4
-            write(file, dataset_names[i], previous_data[i] .+ data[i])
+            write(file, dataset_names[i], data[i])
         end
-    end
-    GC.gc()
 end
 println("Done!")

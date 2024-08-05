@@ -10,7 +10,7 @@
   
 And saves the output as .h5 file with the first four Cumulants stored with dataset names m1,m2,m3,m4. The file is saved in the current folder.
 
-$${\color{red}Welcome \space \color{lightblue}To \space \color{orange}Stackoverflow}$
+$${\color{red}Welcome \space \color{lightblue}To \space \color{orange}Stackoverflow}$$
 
 ## An Example to run it 
 

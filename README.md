@@ -7,9 +7,9 @@
 | Language (Parallelism) | CPU threading | GPU | O() Time per one standard operation |
 | :---: | :---: | :---: | :---: |
 | Python | ❌ | ❌ |$1\ \mu s$ |
-| Python |  | ❌ | $10^{-1}\ \mu s$ |
+| Python | ✅ | ❌ | $10^{-1}\ \mu s$ |
 | Julia (without CPU threading) | ❌ | ❌ | $10^{-1}\ \mu s $ |
 | Rust (without CPU threading) | ❌ | ❌ | $10\ ns$ |
-| Julia (with CPU threading) |  | ❌ | $1\ ns$ |
-| Rust (with CPU threading) |  | ❌ | $1\ ns$ |
-| Julia (with CPU threading + GPU) |  |  | $10^{-1}\ ns$ |
+| Julia (with CPU threading) | ✅ | ❌ | $1\ ns$ |
+| Rust (with CPU threading) | ✅ | ❌ | $1\ ns$ |
+| Julia (with CPU threading + GPU) | ✅ | ✅ | $10^{-1}\ ns$ |

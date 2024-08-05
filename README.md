@@ -4,6 +4,6 @@
 - Rust multi-threaded code seems to be the most stable and as fast as julia multi-threaded one.
 - the fastest of all is [Julia GPU](./Gpu) code with multi-threading.
 
-| Language | Beenchmark (Time) |
+| Language | Beenchmark (Time in $\mu s$) per onee standard operation |
 | --- | --- |
-| Python () | $10^{-6} \mu s$ |
+| Python () | 1 |

@@ -172,7 +172,7 @@ l = parsed_args["chain_length"]
 samples = parsed_args["samples"]
 tmax = parsed_args["t_max"]
 
-filename = "./data/rho_dotp-n_$n0-A_$A-q_$q-samples_$samples-tmax_$tmax-l-$l.h5"
+filename = "./rho_dotp-n_$n0-A_$A-q_$q-samples_$samples-tmax_$tmax-l-$l.h5"
 dataset_names = ["m1", "m2", "m3", "m4"]
 
 # Start timer

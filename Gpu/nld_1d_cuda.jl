@@ -41,7 +41,7 @@ function parse_commandline()
         "--wave_number", "-q"
             help = "wave number mode of initial perturbation. It is constrained to be 0<q<l/2"
             arg_type = Int
-            default = 10
+            default = 999
         #"--flag1"
         #    help = "an option without argument, i.e. a flag"
         #    action = :store_true

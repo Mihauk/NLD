@@ -5,7 +5,7 @@
 - the fastest of all is [Julia GPU](./Gpu) code with multi-threading.
 
 | Language (Parallelism) | CPU threading | GPU | O() Time per one standard operation |
-| :---: | :---: |
+| :---: | :---: | :---: | :---: |
 | Python | - [] |  |$1\ \mu s$ |
 | Python (with CPU threading) |  |  | $10^{-1}\ \mu s$ |
 | Julia (without CPU threading) |  |  | $10^{-1}\ \mu s $ |

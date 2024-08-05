@@ -1,4 +1,4 @@
-# $${\color{red} Julia code using CUDA GPU's to time evolve a lattice gas diffusion model(with non-linearity).$$
+# $${\color{red} Julia code using CUDA GPU's to time evolve a lattice gas diffusion model(with non-linearity).}$$
 
 - The code takes in command line arguments
   -l chain_lenght

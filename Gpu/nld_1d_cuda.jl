@@ -150,8 +150,8 @@ filename = "./data/rho_dotp-n_$n0-A_$A-q_$q-t_samples_$t_samples-samples_each_ru
 dataset_names = ["m1", "m2", "m3", "m4"]
 
 h5open(filename, "w") do file
-        for i in 1:4
-            write(file, dataset_names[i], data[i])
-        end
+    for i in 1:4
+        write(file, dataset_names[i], data[i])
+    end
 end
 println("Done!")

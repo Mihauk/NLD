@@ -1,4 +1,4 @@
-# $\textcolor{orange} {Julia\ code\ using \ CUDA\ GPU's\ to\ time\ evolve\ a\ lattice\  gas\ diffusion\ model(with\ non-linearity).}$
+# $\textcolor{blue} {Julia\ code\ using \ CUDA\ GPU's\ to\ time\ evolve\ a\ lattice\  gas\ diffusion\ model(with\ non-linearity).}$
 
 - The code takes in command line arguments
   -l chain_lenght

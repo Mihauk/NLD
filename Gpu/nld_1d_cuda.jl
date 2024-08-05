@@ -7,6 +7,7 @@ using ArgParse
 using Statistics
 using LinearAlgebra
 
+# Define the mutable struct that stores the data
 mutable struct Total_data
     m1::Vector{Float64}
     m2::Vector{Float64}
@@ -14,6 +15,7 @@ mutable struct Total_data
     m4::Vector{Float64}
 end
 
+# Function to parse command line arguments
 function parse_commandline()
     s = ArgParseSettings()
 
@@ -21,7 +23,7 @@ function parse_commandline()
         "--chain_length", "-l"
             help = "Length of the 1D chain"
             arg_type = Int
-            default = 9999
+            default = 99999
         "--t_max", "-t"
             help = "Number of time steps"
             arg_type = Int
@@ -41,7 +43,7 @@ function parse_commandline()
         "--wave_number", "-q"
             help = "wave number mode of initial perturbation. It is constrained to be 0<q<l/2"
             arg_type = Int
-            default = 999
+            default = 9999
         #"--flag1"
         #    help = "an option without argument, i.e. a flag"
         #    action = :store_true
@@ -53,6 +55,7 @@ function parse_commandline()
     return parse_args(s)
 end
 
+# Function to calculate the cumulants from the moments
 function moment_cumulant(data)
     μ = data[1]
     σ = sqrt.(data[2] .- μ.^2)
@@ -61,6 +64,7 @@ function moment_cumulant(data)
     return [μ, σ, γ, κ]
 end
 
+# Function to update the state based on certain conditions also the CUDA kernel
 function update_d!(state,p)
     idx = (blockIdx().x - 1) * blockDim().x + threadIdx().x
     str = gridDim().x * blockDim().x
@@ -85,27 +89,40 @@ function update_d!(state,p)
     return nothing
 end
 
+# Function to perform computations with multi-threading
 function with_threads(samples, tmax, l, A, q, n0)
-    my_data = Total_data(zeros(Float64, tmax+1), zeros(Float64, tmax+1), zeros(Float64, tmax+1), zeros(Float64, tmax+1))
     
+    # Calculate frequency and wave number and intital distribution to sample from
     freq = 2π * rfftfreq(l)
     Q = freq[q+1]
     Ax = cos.(Q * (1:l))
     rho_in = n0 .+ A * Ax
     
+    # Initialize data structure to store results
+    my_data = Total_data(zeros(Float64, tmax+1), zeros(Float64, tmax+1), zeros(Float64, tmax+1), zeros(Float64, tmax+1))
+
+    # Loop over samples
     for _ in samples
-        CUDA.device!(rand(0:1))
-        conf = rand(Float64, l) .<= rho_in
+
+        CUDA.device!(rand(0:1)) # Set the CUDA device randomly
+
+        conf = rand(Float64, l) .<= rho_in  # Generate initial configuration
         rho_0 = sum(conf .* Ax)/l
+
+        # Update data structure with initial configuration
         @inbounds my_data.m1[1] += rho_0
         @inbounds my_data.m2[1] += rho_0^2
         @inbounds my_data.m3[1] += rho_0^3
         @inbounds my_data.m4[1] += rho_0^4
+
+        # Loop over time steps
         for t in 1:tmax
             lb3 = div(l,3)
             off = cu(rand(0:2))
             state_d = cu(circshift(conf, -off))
             p_d = CUDA.rand(Bool,lb3)
+
+            # Define and launch CUDA kernel
             kernel = @cuda launch=false update_d!(state_d,p_d)
             config = launch_configuration(kernel.fun)
             threads = min(convert(Int,l/3), config.threads) #MAX_THREADS_PER_BLOCK
@@ -113,8 +130,12 @@ function with_threads(samples, tmax, l, A, q, n0)
             CUDA.@sync begin
                 kernel(state_d,p_d; threads, blocks)
             end
+
+             # Update configuration and calculate new density
             conf = Array(circshift(state_d, off))
             rho_t = sum(conf .* Ax)/l
+
+            # Update data structure with new configuration
             @inbounds my_data.m1[t+1] += rho_t
             @inbounds my_data.m2[t+1] += rho_t^2
             @inbounds my_data.m3[t+1] += rho_t^3
@@ -125,6 +146,7 @@ function with_threads(samples, tmax, l, A, q, n0)
     return my_data
 end
 
+# Function to sum the results from all threads
 function sum_multi_thread(samples, tmax, l, A, q, n0)
     chunks = Iterators.partition(1:samples, samples ÷ Threads.nthreads())
     tasks = map(chunks) do chunk
@@ -152,8 +174,12 @@ tmax = parsed_args["t_max"]
 filename = "./data/rho_dotp-n_$n0-A_$A-q_$q-samples_$samples-tmax_$tmax-l-$l.h5"
 dataset_names = ["m1", "m2", "m3", "m4"]
 
+# Calculate and write data to file
 data = moment_cumulant(sum_multi_thread(samples, tmax, l, A, q, n0))
 
+println("Writing to file... -"+filename)
+
+# Write data to file
 h5open(filename, "w") do file
     for i in 1:4
         write(file, dataset_names[i], data[i])

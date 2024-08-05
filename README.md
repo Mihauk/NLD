@@ -12,4 +12,4 @@
 | [Rust](./nld_rust) | ❌ | ❌ | $10\ ns$ |
 | [Julia]((./Julia/nld.jl)) | ✅ | ❌ | $1\ ns$ |
 | [Rust](./nld_rust) | ✅ | ❌ | $1\ ns$ |
-| [Julia]((./Julia/nld_1D.jl)) | ✅ | ✅ | $10^{-1}\ ns$ |
+| [Julia]((./Gpu)) | ✅ | ✅ | $10^{-1}\ ns$ |

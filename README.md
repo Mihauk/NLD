@@ -6,4 +6,4 @@
 
 | Language | Beenchmark (Time) |
 | --- | --- |
-| Python () | $10^-6 \mu s$ |
+| Python () | $10^{-6} \mu s$ |

@@ -14,6 +14,14 @@ mutable struct Total_data
     m4::Vector{Float64}
 end
 
+function moment_cumulant(data)
+    μ = (data[1])
+    σ = sqrt.((data[2]) .- (μ.^2))
+    γ = (data[3] .- 3*(μ.*(σ.^2)) .- μ.^3)./(σ.^3)
+    κ = (data[4] .- 4*(μ.*(data[3])) .+ 6*(μ.*σ).^2 .+ 3*μ.^4)./(σ.^4)
+    return [μ, σ, γ, κ]
+end
+
 function parse_commandline()
     s = ArgParseSettings()
 
@@ -149,7 +157,7 @@ t_samples = parsed_args["t_samples"]
 filename = "./data/rho_dotp-n_$n0-A_$A-q_$q-t_samples_$t_samples-samples_each_run_$samples-tmax_$tmax-l-$l.h5"
 dataset_names = ["m1", "m2", "m3", "m4"]
 
-data = with_threads(samples, tmax, l, A, q, n0)
+data = moment_cumulant(sum_multi_thread(samples, tmax, l, A, q, n0))
 
 h5open(filename, "w") do file
     for i in 1:4

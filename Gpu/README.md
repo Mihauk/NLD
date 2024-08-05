@@ -8,7 +8,7 @@
   -q wave number mode of initial perturbation
   -n equilibrium density
   
-And saves the output as .h5 file with the first four Cumulants stored with dataset names m1,m2,m3,m4.
+And saves the output as .h5 file with the first four Cumulants stored with dataset names m1,m2,m3,m4. The file is saved in the current folder.
 
 
 ## An Example to run it 

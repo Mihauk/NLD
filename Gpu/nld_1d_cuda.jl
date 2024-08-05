@@ -5,6 +5,7 @@ using HDF5
 using Random
 using ArgParse
 using Statistics
+using TimerOutputs
 using LinearAlgebra
 
 # Define the mutable struct that stores the data
@@ -174,10 +175,13 @@ tmax = parsed_args["t_max"]
 filename = "./data/rho_dotp-n_$n0-A_$A-q_$q-samples_$samples-tmax_$tmax-l-$l.h5"
 dataset_names = ["m1", "m2", "m3", "m4"]
 
-# Calculate and write data to file
-data = moment_cumulant(sum_multi_thread(samples, tmax, l, A, q, n0))
+# Start timer
+to = TimerOutput();
 
-println("Writing to file... -"+filename)
+# Calculate and write data to file
+@timeit to "Run time" data = moment_cumulant(sum_multi_thread(samples, tmax, l, A, q, n0))
+
+println("Writing to file... - ", filename)
 
 # Write data to file
 h5open(filename, "w") do file
@@ -186,3 +190,5 @@ h5open(filename, "w") do file
     end
 end
 println("Done!")
+
+print_timer(to)

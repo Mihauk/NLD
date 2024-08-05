@@ -54,7 +54,7 @@ function parse_commandline()
 end
 
 function moment_cumulant(data)
-    μ = (data[1])
+    μ = data[1]
     σ = sqrt.((data[2]) .- (μ.^2))
     γ = (data[3] .- 3*(μ.*(σ.^2)) .- μ.^3)./(σ.^3)
     κ = (data[4] .- 4*(μ.*(data[3])) .+ 6*(μ.*σ).^2 .+ 3*μ.^4)./(σ.^4)

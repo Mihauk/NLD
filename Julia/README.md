@@ -1,4 +1,4 @@
-# $\textcolor{lightblue} {Julia code to time evolve a lattice gas diffusion model(with non-linearity).}
+# $\textcolor{lightblue} {Julia\ code\ to\ time\ evolve\ a\ lattice\ gas\ diffusion\ model(with\ non-linearity).}$
 
 - The code takes in command line arguments
   -l chain_lenght

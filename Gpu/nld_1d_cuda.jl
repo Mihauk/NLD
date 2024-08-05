@@ -21,7 +21,7 @@ function parse_commandline()
         "--chain_length", "-l"
             help = "Length of the 1D chain"
             arg_type = Int
-            default = 999
+            default = 9999
         "--t_max", "-t"
             help = "Number of time steps"
             arg_type = Int
@@ -29,7 +29,7 @@ function parse_commandline()
         "--samples", "-s"
             help = "Total number of samples"
             arg_type = Int
-            default = 1000
+            default = 10000
         "--amplitude", "-a"
             help = "Amplitude of the intital perturbation from equilibrium density at n. n is constrained to be 0<n<1"
             arg_type = Float16

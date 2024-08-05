@@ -9,7 +9,7 @@
 | Python (without CPU threading) | $1\ \mu s$ |
 | Python (with CPU threading) | $10^{-1}\ \mu s$ |
 | Julia (without CPU threading) | $10^{-1}\ \mu s $ |
-| Julia (with CPU threading) | $1\ ns$ |
 | Rust (without CPU threading) | $10\ ns$ |
+| Julia (with CPU threading) | $1\ ns$ |
 | Rust (with CPU threading) | $1\ ns$ |
 | Julia (with CPU threading + GPU) | $10^{-1}\ ns$ |

@@ -104,10 +104,10 @@ function with_threads(samples, tmax, l, A, q, n0, u)
                 end
                 circshift!(conf, k)
                 rho_t = sum(conf .* Ax)/l
-                @inbounds my_data.m_rho[(u+1)*t+k-1] += rho_t
-                @inbounds my_data.v_rho[(u+1)*t+k-1] += rho_t^2
-                @inbounds my_data.s_rho[(u+1)*t+k-1] += rho_t^3
-                @inbounds my_data.k_rho[(u+1)*t+k-1] += rho_t^4
+                @inbounds my_data.m_rho[(u+1)*t+k+1-u] += rho_t
+                @inbounds my_data.v_rho[(u+1)*t+k+1-u] += rho_t^2
+                @inbounds my_data.s_rho[(u+1)*t+k+1-u] += rho_t^3
+                @inbounds my_data.k_rho[(u+1)*t+k+1-u] += rho_t^4
             end
         end
     end

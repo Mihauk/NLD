@@ -43,9 +43,9 @@ function parse_commandline()
             arg_type = Int
             default = 10
         "--update_type", "-u"
-            help = "Type of update to use (1: ABC-ABC, 2: AB-AB)"
+            help = "Type of update to use (1: AB-AB, 2: ABC-ABC)"
             arg_type = Int
-            default = 1
+            default = 2
         #"--flag1"
         #    help = "an option without argument, i.e. a flag"
         #    action = :store_true
@@ -104,10 +104,10 @@ function with_threads(samples, tmax, l, A, q, n0, u)
                 end
                 circshift!(conf, k)
                 rho_t = sum(conf .* Ax)/l
-                @inbounds my_data.m_rho[3t+k-1] += rho_t
-                @inbounds my_data.v_rho[3t+k-1] += rho_t^2
-                @inbounds my_data.s_rho[3t+k-1] += rho_t^3
-                @inbounds my_data.k_rho[3t+k-1] += rho_t^4
+                @inbounds my_data.m_rho[(u+1)*t+k-1] += rho_t
+                @inbounds my_data.v_rho[(u+1)*t+k-1] += rho_t^2
+                @inbounds my_data.s_rho[(u+1)*t+k-1] += rho_t^3
+                @inbounds my_data.k_rho[(u+1)*t+k-1] += rho_t^4
             end
         end
     end
@@ -137,16 +137,16 @@ q = parsed_args["wave_number"]
 l = parsed_args["chain_length"]
 samples = parsed_args["samples"]
 tmax = parsed_args["t_max"]
-update_type = parsed_args["update_type"]
+u = parsed_args["update_type"]
 
-filename = "./data/non_random_rho_dotp-n_$n0-A_$A-q_$q-samples_$samples-tmax_$tmax-l-$l.h5"
+filename = "./data/non_random_rho_dotp-n_$n0-A_$A-q_$q-samples_$samples-tmax_$tmax-l-$l-u-$u.h5"
 dataset_names = ["m1", "m2", "m3", "m4"]
 
 # Start timer
 to = TimerOutput();
 
 # Calculate and write data to file
-@timeit to "Run time" data = moment_cumulant(sum_multi_thread(samples, tmax, l, A, q, n0, update_type))
+@timeit to "Run time" data = moment_cumulant(sum_multi_thread(samples, tmax, l, A, q, n0, u))
 
 println("Writing to file... - ", filename)
 

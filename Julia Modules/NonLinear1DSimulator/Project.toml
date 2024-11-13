@@ -1,5 +1,5 @@
 name = "NonLinear1DSimulator"
-uuid = "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"  # Replace with a unique UUID
+uuid = "1b988188-dac1-4aab-8e36-7eb5ad316eec" 
 version = "0.1.0"
 
 [deps]

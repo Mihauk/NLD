@@ -6,10 +6,10 @@
 
 | Language | CPU threading | GPU | O() Time per one standard operation |
 | :---: | :---: | :---: | :---: |
-| [Python](./old) | ❌ | ❌ |$1\ \mu s$ |
-| Python | ✅ | ❌ | $10^{-1}\ \mu s$ |
-| [Julia](./Julia/nld.jl) | ❌ | ❌ | $10^{-1}\ \mu s $ |
-| [Rust](./nld_rust) | ❌ | ❌ | $10\ ns$ |
-| [Julia](./Julia/nld.jl) | ✅ | ❌ | $1\ ns$ |
-| [Rust](./nld_rust) | ✅ | ❌ | $1\ ns$ |
-| [Julia](./Gpu) | ✅ | ✅ | $10^{-1}\ ns$ |
+| [Python](./old) | ❌ | ❌ | 1 $\mu$ s |
+| Python | ✅ | ❌ | 0.1 $\mu$ s |
+| [Julia](./Julia/nld.jl) | ❌ | ❌ | 0.1 $\mu$ s |
+| [Rust](./nld_rust) | ❌ | ❌ | 10 $n$ s |
+| [Julia](./Julia/nld.jl) | ✅ | ❌ | 1 $n$ s |
+| [Rust](./nld_rust) | ✅ | ❌ | 1 $n$ s|
+| [Julia](./Gpu) | ✅ | ✅ | 0.1 $n$ s|

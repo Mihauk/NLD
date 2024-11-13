@@ -9,13 +9,14 @@ using Random
 using FFTW
 using TimerOutputs
 using Base.Threads
+using LinearAlgebra
 
 """
-    with_threads(samples::UnitRange{Int}, tmax::Int, l::Int, A::Float64, q::Int, n0::Float64, u::Int, mpl::Float64, mph::Float64) -> TotalData
+    with_threads(samples::UnitRange{Int}, tmax::Int, l::Int, A::Float64, q::Int, n0::Float64, u::Int, mpl::Float64, mph::Float64, compute_current::Bool) -> TotalData
 
-Run simulations with threading over the given `samples`, for `tmax` time steps, chain length `l`, amplitude `A`, wave number `q`, equilibrium density `n0`, update type `u`, and waiting probabilities `mpl` and `mph`.
+Run simulations with threading over the given `samples`, for `tmax` time steps, chain length `l`, amplitude `A`, wave number `q`, equilibrium density `n0`, update type `u`, and waiting probabilities `mpl` and `mph`. If `compute_current` is `true`, computes current during simulation.
 """
-function with_threads(samples::UnitRange{Int}, tmax::Int, l::Int, A::Float64, q::Int, n0::Float64, u::Int, mpl::Float64, mph::Float64)
+function with_threads(samples::UnitRange{Int}, tmax::Int, l::Int, A::Float64, q::Int, n0::Float64, u::Int, mpl::Float64, mph::Float64, compute_current::Bool)
     qb2 = Int(ceil(q / 2))
     num_timesteps = (u + 1) * tmax + 1
     my_data = TotalData(
@@ -26,7 +27,7 @@ function with_threads(samples::UnitRange{Int}, tmax::Int, l::Int, A::Float64, q:
     )
 
     for _ in samples
-        my_conf = Conf(initQ(l, q - 1, n0, A))
+        my_conf = initQ(l, q - 1, n0, A, compute_current)
         tmp_0 = fft(my_conf.st) / sqrt(l)
         # Initial data collection
         for k in 1:qb2 - 1
@@ -39,7 +40,7 @@ function with_threads(samples::UnitRange{Int}, tmax::Int, l::Int, A::Float64, q:
         # Time evolution
         for t in 1:tmax
             for d in 0:u
-                single_upd!(my_conf, d, mpl, mph)
+                single_upd!(my_conf, d, mpl, mph, compute_current)
                 tmp_t = fft(my_conf.st) / sqrt(l)
                 idx = (u + 1) * t + d + 1 - u
                 for k in 1:qb2 - 1
@@ -49,6 +50,12 @@ function with_threads(samples::UnitRange{Int}, tmax::Int, l::Int, A::Float64, q:
                     @inbounds my_data.m3[k, idx] += rho_t^3
                     @inbounds my_data.m4[k, idx] += rho_t^4
                 end
+                # Additional processing if compute_current is true
+                if compute_current
+                    # Process current data as needed
+                    # For example, accumulate current values
+                    # current_sum += sum(my_conf.curr)
+                end
             end
         end
     end
@@ -56,16 +63,16 @@ function with_threads(samples::UnitRange{Int}, tmax::Int, l::Int, A::Float64, q:
 end
 
 """
-    sum_multi_thread(samples::Int, tmax::Int, l::Int, A::Float64, q::Int, n0::Float64, u::Int, mpl::Float64, mph::Float64) -> Vector{Matrix{Float64}}
+    sum_multi_thread(samples::Int, tmax::Int, l::Int, A::Float64, q::Int, n0::Float64, u::Int, mpl::Float64, mph::Float64, compute_current::Bool) -> Vector{Matrix{Float64}}
 
-Run the simulations using multithreading, splitting the `samples` among available threads.
+Run the simulations using multithreading, splitting the `samples` among available threads. If `compute_current` is `true`, computes current during simulation.
 """
-function sum_multi_thread(samples::Int, tmax::Int, l::Int, A::Float64, q::Int, n0::Float64, u::Int, mpl::Float64, mph::Float64)
+function sum_multi_thread(samples::Int, tmax::Int, l::Int, A::Float64, q::Int, n0::Float64, u::Int, mpl::Float64, mph::Float64, compute_current::Bool)
     num_threads = nthreads()
     chunk_size = samples ÷ num_threads
     chunks = [((i - 1) * chunk_size + 1):min(i * chunk_size, samples) for i in 1:num_threads]
     tasks = map(chunks) do chunk
-        Threads.@spawn with_threads(chunk, tmax, l, A, q, n0, u, mpl, mph)
+        Threads.@spawn with_threads(chunk, tmax, l, A, q, n0, u, mpl, mph, compute_current)
     end
     chunk_sums = fetch.(tasks)
     total_samples = samples
@@ -91,6 +98,7 @@ function run_simulation(params::Dict{String, Any})
     u = params["update_type"]
     mpl = params["wait_probability_low_density"]
     mph = params["wait_probability_high_density"]
+    compute_current = params["compute_current"]
 
     filename = params["output_file"]
     dataset_names = ["m1", "m2", "m3", "m4"]
@@ -99,7 +107,7 @@ function run_simulation(params::Dict{String, Any})
     to = TimerOutput()
 
     # Run simulation and compute moments
-    @timeit to "Run time" data = moment_cumulant(sum_multi_thread(samples, tmax, l, A, q, n0, u, mpl, mph))
+    @timeit to "Run time" data = moment_cumulant(sum_multi_thread(samples, tmax, l, A, q, n0, u, mpl, mph, compute_current))
 
     println("Writing to file... - ", filename)
 

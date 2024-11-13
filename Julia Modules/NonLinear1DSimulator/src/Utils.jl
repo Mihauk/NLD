@@ -67,6 +67,10 @@ function parse_commandline()
             help = "Output filename"
             arg_type = String
             default = "output.h5"
+        "--compute_current", "-c"
+            help = "Compute current during simulation"
+            action = :store_true
+            default = false
     end
 
     return parse_args(s)

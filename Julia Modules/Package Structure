@@ -1,0 +1,8 @@
+NonLinear1DSimulator/
+  Project.toml
+  src/
+    NonLinear1DSimulator.jl
+    Config.jl
+    Update.jl
+    Simulation.jl
+    Utils.jl

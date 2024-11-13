@@ -1,0 +1,9 @@
+name = "NonLinear1DSimulator"
+uuid = "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"  # Replace with a unique UUID
+version = "0.1.0"
+
+[deps]
+ArgParse = "c7e460c6-88f5-11e8-39b5-9946a9ab6751"
+FFTW = "7a1cc6ca-1aaa-5e01-8fda-36ec60fd8f0c"
+HDF5 = "f67ccb44-e63f-5c2f-98bd-6dc0ccc4ba2f"
+TimerOutputs = "a2a6695c-2af1-5d48-9d26-ec68c0e9a973"
